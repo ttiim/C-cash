@@ -11,12 +11,6 @@
 	• to build a simple blockchain implementation;
   */
   
-  /*
-  
-  Draw out some doubly linked lists and how they look. keep looking through given code. remember dont need to understand every bit to understand what you
-  are working on.
-  
-  */
   
 
 #include <stdio.h>
@@ -37,20 +31,21 @@
 const int DEFAULT_DIFFICULTY = 2;              // Default difficulty for hashing puzzles, increase to make mining harder
 
 //helper prototypes
-void bcpop(Blockchain* bc);
-bool bcIsEmpty(BlockChain bc);
+void bcpop(bc_t* bc);
+bool bcIsEmpty(bc_t bc);
+void blockPrint(const Block_t blk) ;
 
 /***************************************
  * Helper functions
  * **************************************/
 
 
-void bcpop(Blockchain* bc)    // Dynamic transactions in t are owned by this Block and will be deleted when this Block is deleted!
+void bcpop(bc_t* bc)   //mutable function // Dynamic transactions in t are owned by this Block and will be deleted when this Block is deleted!
 {
     
-   assert(!bcIsEmpty(*stack));   
+   assert(!bcIsEmpty(*bc));   
    Block_t* blk = bc->head->next;
-   bc->head->next=bc->next;
+   bc->head->next=blk->next;
    
    if (bc->tail == blk) 
    {
@@ -58,22 +53,34 @@ void bcpop(Blockchain* bc)    // Dynamic transactions in t are owned by this Blo
 	   }
 	   
     blkDelete(blk); 
-    
-    
-    
-    
+
 }
 
 
-bool bcIsEmpty(const BlockChain bc) 
+bool bcIsEmpty(const bc_t bc) 
 {
    return bc.head->next == NULL;
 }
 
 
+void blockPrint(const Block_t blk)    //could print the other elements of the block but will only do if we distribute it-then we can look up.
+{
+    
+    int i=0;
+    printf("Block [%d]\n", i);
+    
+   // printf("------------------------------------\n");
+    TransactionList list= blk.transactions;
+    tlistPrint(list);
+   // printf("------------------------------------\n");
+    
+    i++;
+    
+    printf("id: [%d]%s\n", blk.id-1, blk.next ? "-->" : "________________|");
+}
 
 
-
+ 
 
 
 
@@ -82,13 +89,16 @@ bool bcIsEmpty(const BlockChain bc)
  * **************************************/
 
 /*
- * Constructor - return a new, empty BlockChain 
+ * Constructor - return a new, empty bc_t 
  * POST:  bcLen(chain) == 0
  */
-BlockChain bcNew( );
+bc_t bcNew( )
 {
-  block_t* firstBlk = blkCreate(tlistCreate(),DEFAULT_DIFFICULTY, NULL_NONCE);  //dummy node? that contains all emty items. -block only created when listdata
-  BlockChain bc = {firstBlk, firstBlk}
+  TransactionList t1 = tlistCreate(); // only would create a bc when needing a transaction list.
+  Block_t* zeroBlock = blkCreate(t1, DEFAULT_DIFFICULTY, NULL_NONCE);  //dummy nodey
+  bc_t bc = {zeroBlock, zeroBlock};
+  return bc;
+  
 }
 
 
@@ -96,26 +106,40 @@ BlockChain bcNew( );
  * Destructor - remove all data and free all memory associated with the chain 
  * POST: bcLen(chain) == 0
  */
-void bcDelete( BlockChain *chain)
+void bcDelete( bc_t *chain)
 {
     
     while (chain->head->next != NULL) 
 	 {
-		 llPop(chain);
+		 bcpop(chain);
+		
 		 }
 }
 
 /*
  * Print a text representation of this chain on STDOUT
  */
-void bcPrint( const BlockChain chain ); 
+void bcPrint( const bc_t chain )
+{
+  
+  Block_t* cur = chain.head; 
+  printf("\nBlockchain:\n  ");
+  
+  while (cur != NULL) 
+  {
+	  blockPrint(*cur);
+      cur = cur->next;
+	  }
+	  
+	  printf("\n\n");	
+}
 
 /*
  * Return the number of Blocks in the chain
  */
-int bcLen( const BlockChain chain )
+int bcLen( const bc_t chain )
 {
-  block_t* cur = chain.head->next;
+  Block_t* cur = chain.head->next;
   int len = 0;
   while (cur != NULL) 
   {
@@ -130,14 +154,14 @@ int bcLen( const BlockChain chain )
 /*
  *  Return true iff blkIsValid(block) for every block in the chain
  */
-bool bcIsValid(const BlockChain chain)
+bool bcIsValid(const bc_t chain)
 {
     
   Block_t* cur = chain.head->next;
   
   while (cur != NULL) 
   {
-	  if (!blkIsValid(chain))
+	  if (!blkIsValid(*cur))     // bool blkIsValid(const Block_t block);
 	  {
 	      return false;
 	      
@@ -154,7 +178,7 @@ bool bcIsValid(const BlockChain chain)
 /*
  * Return a pointer to the chain's tail Block
  */
-Block_t* bcTail(const BlockChain chain)
+Block_t* bcTail(const bc_t chain)
 {
     return chain.tail;
 }
@@ -164,11 +188,11 @@ Block_t* bcTail(const BlockChain chain)
  *    iff blkValidates(new_block, bcTail->hash, new_block->proof_of_work)
  * POST: bcTail(*chain) == new_block && blkIsValid(*new_block)
  */
-void bcAppend( BlockChain *chain, Block_t* new_block )
+void bcAppend( bc_t *chain, Block_t* new_block )
 {
-    block_t*cur = new_block;
+    Block_t*cur = new_block;
     
-    blkChainTo(tail_block, new_block);
+    blkChainTo(chain->tail, new_block);
     chain->tail->next=cur;
     
     assert (bcTail(*chain) == new_block && blkIsValid(*new_block));   

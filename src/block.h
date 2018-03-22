@@ -29,7 +29,7 @@ struct  Block_s {
  * Constructor - return pointer to new block to lock given data 
  * POST:  tlistLen(list) == 0
  */
-Block_t* blkCreate(TransactionList t, int difficulty, Nonce_t proof_of_work );
+
 
 /*
  * Destructor - free all dynamic memory associated with the given block
