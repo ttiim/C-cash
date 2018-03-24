@@ -1,7 +1,7 @@
 /*Capilano University
 *   Comp 220- Professor Jospeph Fall
 *   Authour: Tim Wriglesworth
-*   Worked in collaboration with  Karan Nedungadi
+*   Worked in collaboration with Karan Nedungadi
 *   Date:15.03.18
     Assignment  Blockchain C-cash  
 *  Objectives:Input: any text
@@ -46,6 +46,7 @@ void bcpop(bc_t* bc)   //mutable function // Dynamic transactions in t are owned
    assert(!bcIsEmpty(*bc));   
    Block_t* blk = bc->head->next;
    bc->head->next=blk->next;
+   //blk->next->prev = bc->head;
    
    if (bc->tail == blk) 
    {
@@ -171,13 +172,17 @@ bool bcIsValid(const bc_t chain)
   {
 	  if (!blkIsValid(*cur))     // bool blkIsValid(const Block_t block);
 	  {
+	      
 	      return false;
 	      
 	  }
 	  
+	  
 	  cur = cur->next;
-      
+	  
+     
   }
+   assert(cur==bcTail(chain)->next);
     
    return true;
 }
@@ -212,24 +217,6 @@ void bcAppend( bc_t *chain, Block_t* new_block )
     }
    
     
-   // printf("prev hash:");
-    //printHash(new_block->prev->hash);                         ///---
-   
-//   //printf("chain->tail");
-//   //blockPrint(*bcTail(*chain));
-//   printf("The value of the boolean expression [blkisValid is]: \n");
-//   printf("%d\n\n\n", blkIsValid(*new_block));
-   
-//   printf("the new block is:\n" );
-//   blockPrint(*new_block);
-//     printf("prev hash:\n\n\n");
-   //printHash(new_block->prev->hash);
-   
-   
-  // printf("appending block....");
-   
-   
-   
    
     assert (bcTail(*chain) == new_block && blkIsValid(*new_block));   
    
