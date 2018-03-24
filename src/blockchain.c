@@ -63,10 +63,10 @@ bool bcIsEmpty(const bc_t bc)
 }
 
 
-void blockPrint(const Block_t blk)    //could print the other elements of the block but will only do if we distribute it-then we can look up.
+void blockPrint( Block_t blk)    //could print the other elements of the block but will only do if we distribute it-then we can look up.
 {
-    
-    int i=0;
+    printf("____________________________________________________\n");
+    static int i=0;
     printf("Block [%d]\n", i);
     
    // printf("------------------------------------\n");
@@ -75,8 +75,14 @@ void blockPrint(const Block_t blk)    //could print the other elements of the bl
    // printf("------------------------------------\n");
     
     i++;
+
+  printf("id: [%d]%s\n", blk.id-1, blk.next ? "-->" : "\n|____________________________________________________|");
+   
+  printf( "This Block's Hash is:");
+  printHash(blk.hash);
     
-    printf("id: [%d]%s\n", blk.id-1, blk.next ? "-->" : "________________|");
+    
+    
 }
 
 
@@ -97,6 +103,7 @@ bc_t bcNew( )
   TransactionList t1 = tlistCreate(); // only would create a bc when needing a transaction list.
   Block_t* zeroBlock = blkCreate(t1, DEFAULT_DIFFICULTY, NULL_NONCE);  //dummy nodey
   bc_t bc = {zeroBlock, zeroBlock};
+  blkComputeHash(zeroBlock);  ///needs random hash
   return bc;
   
 }
@@ -124,6 +131,7 @@ void bcPrint( const bc_t chain )
   
   Block_t* cur = chain.head; 
   printf("\nBlockchain:\n  ");
+  
   
   while (cur != NULL) 
   {
@@ -190,11 +198,39 @@ Block_t* bcTail(const bc_t chain)
  */
 void bcAppend( bc_t *chain, Block_t* new_block )
 {
-    Block_t*cur = new_block;
+    if (bcIsEmpty(*chain))
+    {
+        
+        chain->head->next = chain->tail= new_block;
+        new_block->prev = chain->head;
+        blkComputeHash(new_block);                      ///----
+    }
+    else
+    {
+     blkChainTo(chain->tail, new_block);
+     chain->tail= new_block;
+    }
+   
     
-    blkChainTo(chain->tail, new_block);
-    chain->tail->next=cur;
-    
+   // printf("prev hash:");
+    //printHash(new_block->prev->hash);                         ///---
+   
+//   //printf("chain->tail");
+//   //blockPrint(*bcTail(*chain));
+//   printf("The value of the boolean expression [blkisValid is]: \n");
+//   printf("%d\n\n\n", blkIsValid(*new_block));
+   
+//   printf("the new block is:\n" );
+//   blockPrint(*new_block);
+//     printf("prev hash:\n\n\n");
+   //printHash(new_block->prev->hash);
+   
+   
+  // printf("appending block....");
+   
+   
+   
+   
     assert (bcTail(*chain) == new_block && blkIsValid(*new_block));   
    
 }
