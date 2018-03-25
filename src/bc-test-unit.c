@@ -80,17 +80,19 @@ void main()
    
    
     printf("2");
+    // EvaluationOfblkisValid (newBlk );
     bcAppend(&bc,newBlk);
+    //EvaluationOfblkisValid (newBlk );
     failed_test_counter += run_test(bcLen(bc), 1, "List length incorrect after Appending 1 items.");
     printf(".");
-   
+   //bcPrint(bc);
    
     
   
   //Test 3: append a second block
  
   TransactionList t2 = tlistCreate( );                     //need to create a transaction list
-   for (i=0; i<5; i++) 
+   for (i=0; i<3; i++) 
    {
       tlistAppend(&t2, "Tom", 12.34, "Sarah");
    }
@@ -124,7 +126,7 @@ void main()
    TransactionList t3 = tlistCreate( );                     //need to create a transaction list
    for (i=0; i<5; i++) 
    {
-      tlistAppend(&t3, "logan", 12.34, "emily");
+      tlistAppend(&t3, "logan", 1000.00, "emily");
    }
    
    Block_t* newBlk3 = blkCreate(t3 , DEFAULT_DIFFICULTYY, NULL_NONCE);        
@@ -144,30 +146,88 @@ void main()
    
    
    
+   //Test 5:
+   
+   TransactionList t4 = tlistCreate( );                     //need to create a transaction list
+   for (i=0; i<10; i++) 
+   {
+      tlistAppend(&t4, "Samuel", 30.00, "Thor");
+   }
+   
+   Block_t* newBlk4 = blkCreate(t4 , DEFAULT_DIFFICULTYY, NULL_NONCE);        
+   
+   //bcPrint(bc);
+   Puzzle_t newPuzzle4 = blkCreatePuzzle(*newBlk4, bc.tail->hash);
+   newBlk4->proof_of_work = puzzleMine(newPuzzle4);
    
    
-   //Test 5: test if entire chain is valid.
+   
+   
+   
+   
    printf("5");
-   failed_test_counter += run_test(bcIsValid(bc), true, "Blockchain is not valid");
+   bcAppend(&bc,newBlk4);
+   failed_test_counter += run_test(bcLen(bc), 4, "List length incorrect after Appending 1 items.");
    printf(".");
    
    
-   //printf("THE BLOCKCHAIN with 3 Blocks of Data\n");
-   //bcPrint(bc); 
    
-// Test 5: Destructor: destroy the blockchain chain
    
+   //Test 6: test if entire chain is valid.
    printf("6");
+   failed_test_counter += run_test(bcIsValid(bc), true, "Blockchain is not valid");
+   printf(".");
+   
+   //bcPrint(bc); 
+   //bcPrintTail (bc);
+   
+   
+    //---------------------[whitebox test]--------------------
+   //Test 7: Append:  try appending a non valid block 
+  
+   // TransactionList t5 = tlistCreate( );                    
+   // for (i=0; i<10; i++) 
+   // {
+   //    tlistAppend(&t5, "Tammy", 30.00, "James");
+   // }
+   
+   // TransactionList tscam = tlistCreate( );                    
+   // for (i=0; i<5; i++) 
+   // {
+   //    tlistAppend(&tscam, "Scam", 30.00, "Scam");
+   // }
+   
+   // Block_t* newBlk5 = blkCreate(t5 , DEFAULT_DIFFICULTYY, NULL_NONCE);            //correct block
+   // Block_t* FalsifiedBlk = blkCreate(tscam , DEFAULT_DIFFICULTYY, NULL_NONCE);    //incorrect block
+   
+   
+   
+   //  Puzzle_t newPuzzle5 = blkCreatePuzzle(*newBlk5, bc.tail->hash);           //correct PoW
+   //  Puzzle_t WrongPuzzle = blkCreatePuzzle(*FalsifiedBlk, bc.tail->hash);      //incorrect PoW
+  
+   //  FalsifiedBlk->proof_of_work = puzzleMine(newPuzzle5);   // give the wrong proof of work (ie blk is not valid)
+   
+   //  printf("7");
+   // bcAppend(&bc,FalsifiedBlk);   
+   //append should crash program here!: -> assert (bcTail(*chain) == new_block && blkIsValid(*new_block));
+   
+   
+   
+
+// Test 8: Destructor: destroy the blockchain chain
+   
+   printf("8");
    bcDelete(&bc);
    failed_test_counter += run_test(bcLen(bc), 0, "Destructor fails to empty the list.");
+   assert(bcIsEmpty(bc)==true);
    printf(".");
    //bcPrint(bc);
    
    
 
 
-
- printf("\n\nUnit Test Suite Complete: Tim You have won ");
+ printf("\nlength of bc after being deleted is: [%d]\n",bcLen(bc));
+ printf("\n\nUnit Test Suite Complete: Glückwunsch! Du hast es geschafft! ");
  if (failed_test_counter == 0) printf("ALL TESTS PASSED\n");
  else printf("FAILED %d TESTS\n", failed_test_counter);   
  

@@ -58,3 +58,33 @@ Block_t* bcTail(const bc_t chain);
  * POST: bcTail(*chain) == new_block && blkIsValid(*new_block)
  */
 void bcAppend( bc_t *chain, Block_t* new_block );
+
+
+
+//Additional Function ideas for Application type development
+
+
+/*
+
+show a users balance
+
+*/
+
+
+/*
+
+dont allow negative balances
+
+*/
+
+/*
+
+Show a transaction history of 2 users
+
+*/
+
+/*
+
+pay a miner for a proof of work
+
+*/

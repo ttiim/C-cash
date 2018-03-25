@@ -33,26 +33,86 @@ const int DEFAULT_DIFFICULTY = 2;              // Default difficulty for hashing
 //helper prototypes
 void bcpop(bc_t* bc);
 bool bcIsEmpty(bc_t bc);
-void blockPrint(const Block_t blk) ;
+void blockPrint( Block_t blk) ;
+
+
+
+//debugger prototypes
+void bcPrintTail (bc_t bc);
+void bcPrintNewBlock (Block_t blk);
+void EvaluationOfblkisValid (Block_t* new_block );
+
+
+
+/***************************************
+ * Debugger Helper functions
+ * **************************************/
+
+void bcPrintTail (bc_t bc)
+{
+    blockPrint(*bc.tail);
+}
+
+void bcPrintNewBlock (Block_t blk)
+{
+    
+    blockPrint(blk);
+    
+}
+
+void EvaluationOfblkisValid (Block_t* new_block )  //assert (bcTail(*chain) == new_block && blkIsValid(*new_block));  
+
+{
+    
+    if (blkIsValid(*new_block))
+    {
+        printf("\nIS VALID\n");
+        
+    }
+    else
+    {
+      printf("\nNOT VALID!!!!!!!!!\n");  
+        
+    }
+}
+
+
+
+
+
+
+
+
 
 /***************************************
  * Helper functions
  * **************************************/
 
 
+/*
+*
+*free the data "block per block"
+*
+*/
+
 void bcpop(bc_t* bc)   //mutable function // Dynamic transactions in t are owned by this Block and will be deleted when this Block is deleted!
 {
     
-   assert(!bcIsEmpty(*bc));   
-   Block_t* blk = bc->head->next;
-   bc->head->next=blk->next;
-   //blk->next->prev = bc->head;
+assert(!bcIsEmpty(*bc));   
+Block_t* blk = bc->head->next;
    
-   if (bc->tail == blk) 
-   {
+
+  bc->head->next=blk->next;
+  //blk->next->prev = bc->head;
+   
+  if (bc->tail == blk) 
+  {
 	   bc->tail = bc->head;
-	   }
+	   blkDelete(bc->head);
 	   
+	   }
+	//printf("\nattempting to pop this block:\n"); 
+	//blockPrint(*blk);
     blkDelete(blk); 
 
 }
@@ -66,21 +126,31 @@ bool bcIsEmpty(const bc_t bc)
 
 void blockPrint( Block_t blk)    //could print the other elements of the block but will only do if we distribute it-then we can look up.
 {
-    printf("____________________________________________________\n");
-    static int i=0;
-    printf("Block [%d]\n", i);
+    printf("\n\n\nProperties of Block:\n");
+    printf("Block id: [%d]\n", blk.id-1);
+   // printf("\t%s\n", blk.proof_of_work);          
+    printHash(blk.hash);  
+    // printf("The hash of the previous block is:");
+   // printHash(blk.prev->hash);
     
+    
+    
+    printf("____________________________________________________\n");
+    
+   
    // printf("------------------------------------\n");
     TransactionList list= blk.transactions;
     tlistPrint(list);
    // printf("------------------------------------\n");
     
-    i++;
-
-  printf("id: [%d]%s\n", blk.id-1, blk.next ? "-->" : "\n|____________________________________________________|");
+    
+  
+    
+    
+  printf("\n|____________________________________________________|");
    
-  printf( "This Block's Hash is:");
-  printHash(blk.hash);
+ 
+  
     
     
     
@@ -122,6 +192,7 @@ void bcDelete( bc_t *chain)
 		 bcpop(chain);
 		
 		 }
+		
 }
 
 /*
@@ -130,7 +201,7 @@ void bcDelete( bc_t *chain)
 void bcPrint( const bc_t chain )
 {
   
-  Block_t* cur = chain.head; 
+  Block_t* cur = chain.head->next; 
   printf("\nBlockchain:\n  ");
   
   
@@ -203,23 +274,26 @@ Block_t* bcTail(const bc_t chain)
  */
 void bcAppend( bc_t *chain, Block_t* new_block )
 {
-    if (bcIsEmpty(*chain))
+    
+    TransactionList list= new_block->transactions;
+    assert(tlistLen(list) != 0);                    
+     
+     if (bcIsEmpty(*chain))
     {
-        
         chain->head->next = chain->tail= new_block;
         new_block->prev = chain->head;
-        blkComputeHash(new_block);                      ///----
+        blkComputeHash(new_block);
     }
-    else
+    else 
     {
-     blkChainTo(chain->tail, new_block);
-     chain->tail= new_block;
+       
+        //EvaluationOfblkisValid (new_block );  //debugger function
+        blkChainTo(bcTail(*chain), new_block);
+        //EvaluationOfblkisValid (new_block );   //debugger function
+        chain->tail= new_block;
+        //EvaluationOfblkisValid (new_block );     //debugger function
     }
-   
-    
-   
     assert (bcTail(*chain) == new_block && blkIsValid(*new_block));   
-   
 }
   
   
