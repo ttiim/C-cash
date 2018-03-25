@@ -221,13 +221,13 @@ void main()
    failed_test_counter += run_test(bcLen(bc), 0, "Destructor fails to empty the list.");
    assert(bcIsEmpty(bc)==true);
    printf(".");
-   //bcPrint(bc);
+  // bcPrint(bc);
    
    
 
 
  printf("\nlength of bc after being deleted is: [%d]\n",bcLen(bc));
- printf("\n\nUnit Test Suite Complete: Glückwunsch! Du hast es geschafft! ");
+ printf("\n\nUnit Test Suite Complete: Glückwunsch! Du hast es geschafft!\n ");
  if (failed_test_counter == 0) printf("ALL TESTS PASSED\n");
  else printf("FAILED %d TESTS\n", failed_test_counter);   
  

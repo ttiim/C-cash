@@ -99,22 +99,31 @@ void bcpop(bc_t* bc)   //mutable function // Dynamic transactions in t are owned
 {
     
 assert(!bcIsEmpty(*bc));   
-Block_t* blk = bc->head->next;
-   
 
-  bc->head->next=blk->next;
-  //blk->next->prev = bc->head;
+
+
+bc->tail = bc->tail->prev;   //deal with dangling pointers! Careful here
+blkDelete(bc->tail->next);
+bc->tail->next=NULL;
+
+
+/*********************************
+ * Ask Joseph  what going on here?
+ * ********************************
+// Block_t* blk = bc->head->next;
+//   bc->head->next=blk->next;
+//   //blk->next->prev = bc->head;
    
-  if (bc->tail == blk) 
-  {
-	   bc->tail = bc->head;
-	   blkDelete(bc->head);
+//   if (bc->tail == blk) 
+//   {
+// 	   bc->tail = bc->head;
+// 	   blkDelete(bc->head);
 	   
-	   }
-	//printf("\nattempting to pop this block:\n"); 
-	//blockPrint(*blk);
-    blkDelete(blk); 
-
+// 	   }
+// 	//printf("\nattempting to pop this block:\n"); 
+// 	//blockPrint(*blk);
+//     blkDelete(blk); 
+*//***************************************/
 }
 
 
