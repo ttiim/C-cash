@@ -5,7 +5,7 @@
  *  Author:  
  *  Date:    Feb. 1, 2018
  */
-//this is a test to see if it works
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
